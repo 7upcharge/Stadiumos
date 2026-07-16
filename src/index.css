@@ -1,0 +1,144 @@
+@import "tailwindcss";
+
+@theme {
+  --animate-pulse-border: pulse-border 1.5s infinite;
+  --animate-pulse-opacity: pulse-opacity 2s infinite ease-in-out;
+}
+
+@keyframes pulse-border {
+  0% {
+    stroke-width: 1.5px;
+    stroke-opacity: 0.8;
+  }
+  50% {
+    stroke-width: 4px;
+    stroke-opacity: 1;
+  }
+  100% {
+    stroke-width: 1.5px;
+    stroke-opacity: 0.8;
+  }
+}
+
+@keyframes pulse-opacity {
+  0%, 100% { opacity: 0.6; }
+  50% { opacity: 1; }
+}
+
+/* Custom scrollbars and scroll selections */
+::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+::-webkit-scrollbar-track {
+  background: #000000;
+}
+::-webkit-scrollbar-thumb {
+  background: #27272a;
+  border-radius: 999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #52525b;
+}
+
+/* Accessible focus outline */
+:focus-visible {
+  outline: 2px solid #a855f7 !important;
+  outline-offset: 2px;
+}
+
+/* ═══════════════════════════════════════
+   Scenario Simulator — Animations & Utilities
+   ═══════════════════════════════════════ */
+
+/* Confidence meter ring */
+.sim-confidence-ring {
+  transform: rotate(-90deg);
+}
+.sim-confidence-ring-bg {
+  stroke: rgba(63, 63, 70, 0.4);
+  fill: none;
+}
+.sim-confidence-ring-fill {
+  fill: none;
+  stroke-linecap: round;
+  transition: stroke-dashoffset 1s ease-out, stroke 0.3s ease;
+}
+
+/* Pipeline loading dots */
+@keyframes sim-dot-pulse {
+  0%, 80%, 100% { transform: scale(0.6); opacity: 0.4; }
+  40% { transform: scale(1); opacity: 1; }
+}
+.sim-loading-dot {
+  animation: sim-dot-pulse 1.4s ease-in-out infinite;
+}
+
+/* Pipeline glow pulse */
+@keyframes sim-glow {
+  0%, 100% { box-shadow: 0 0 8px rgba(6, 182, 212, 0.3); }
+  50% { box-shadow: 0 0 20px rgba(6, 182, 212, 0.6); }
+}
+.sim-glow-pulse {
+  animation: sim-glow 2s ease-in-out infinite;
+}
+
+/* Pipeline progress bar sweep */
+@keyframes sim-progress {
+  0% { transform: translateX(-100%); }
+  50% { transform: translateX(0%); }
+  100% { transform: translateX(100%); }
+}
+.sim-progress-bar {
+  animation: sim-progress 1.5s ease-in-out infinite;
+}
+
+/* Expand-in animation for alternatives */
+@keyframes sim-expand {
+  0% {
+    max-height: 0;
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  100% {
+    max-height: 600px;
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.sim-expand-in {
+  animation: sim-expand 0.4s ease-out forwards;
+}
+
+/* Fade-in animation */
+@keyframes sim-fade-in {
+  0% { opacity: 0; }
+  100% { opacity: 1; }
+}
+.animate-fade-in {
+  animation: sim-fade-in 0.4s ease-out;
+}
+
+/* Risk level badges */
+.sim-badge-low {
+  background: rgba(16, 185, 129, 0.15);
+  color: #34d399;
+  border: 1px solid rgba(16, 185, 129, 0.3);
+}
+.sim-badge-medium {
+  background: rgba(245, 158, 11, 0.15);
+  color: #fbbf24;
+  border: 1px solid rgba(245, 158, 11, 0.3);
+}
+.sim-badge-high {
+  background: rgba(239, 68, 68, 0.15);
+  color: #f87171;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+/* Responsive results grid */
+@media (max-width: 768px) {
+  .sim-results-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
