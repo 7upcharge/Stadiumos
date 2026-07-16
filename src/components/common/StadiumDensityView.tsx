@@ -229,8 +229,41 @@ export default function StadiumDensityView({ beforeState, afterState, affectedGa
         </div>
       </div>
 
+      {/* Screen-reader-only table of gate density data */}
+      <table className="sr-only">
+        <caption>Comparison of gate crowd loads before and after simulation</caption>
+        <thead>
+          <tr>
+            <th scope="col">Gate Name</th>
+            <th scope="col">Status Before</th>
+            <th scope="col">Load Before (people/min)</th>
+            <th scope="col">Status After</th>
+            <th scope="col">Load After (people/min)</th>
+            <th scope="col">Capacity</th>
+            <th scope="col">Utilization After</th>
+          </tr>
+        </thead>
+        <tbody>
+          {beforeState.gates.map((beforeGate) => {
+            const afterGate = afterState.gates.find(g => g.id === beforeGate.id) || beforeGate;
+            const utilization = afterGate.isOpen ? ((afterGate.currentLoad / afterGate.capacity) * 100).toFixed(0) + '%' : 'Closed';
+            return (
+              <tr key={beforeGate.id}>
+                <td>{beforeGate.name}</td>
+                <td>{beforeGate.isOpen ? 'Open' : 'Closed'}</td>
+                <td>{beforeGate.currentLoad}</td>
+                <td>{afterGate.isOpen ? 'Open' : 'Closed'}</td>
+                <td>{afterGate.currentLoad}</td>
+                <td>{beforeGate.capacity}</td>
+                <td>{utilization}</td>
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
+
       {/* Legend */}
-      <div className="flex items-center justify-center gap-4 mt-4 text-[10px] text-zinc-500">
+      <div className="flex items-center justify-center gap-4 mt-4 text-[10px] text-zinc-400">
         <div className="flex items-center gap-1">
           <div className="w-3 h-3 rounded-full bg-emerald-500" />
           <span>&lt;70%</span>

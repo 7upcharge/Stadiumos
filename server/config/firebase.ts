@@ -1,12 +1,12 @@
 import { initializeApp, cert } from 'firebase-admin/app';
-import { getFirestore } from 'firebase-admin/firestore';
-import { getAuth } from 'firebase-admin/auth';
+import { getFirestore, type Firestore } from 'firebase-admin/firestore';
+import { getAuth, type Auth } from 'firebase-admin/auth';
 import dotenv from 'dotenv';
 
 dotenv.config();
 
-let db: any;
-let auth: any;
+let db: Firestore | MockFirestore;
+let auth: Auth | MockAuth;
 let isMock = false;
 
 // Simple In-Memory Mock Database for Firestore CRUD operations

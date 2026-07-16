@@ -80,11 +80,45 @@ export async function reasonWithGemini(
   const { GoogleGenerativeAI } = await import('@google/generative-ai');
 
   const genAI = new GoogleGenerativeAI(apiKey);
+
+  const reasoningOutputSchema = {
+    type: 'object',
+    properties: {
+      action_plan: {
+        type: 'array',
+        items: { type: 'string' },
+        description: '4-6 prioritized action items ordered by urgency.'
+      },
+      reasoning: {
+        type: 'string',
+        description: '2-3 sentences interpreting the simulation results and citing specific metrics.'
+      },
+      risk_level: {
+        type: 'string',
+        description: 'Operational risk assessment. One of: low, medium, high'
+      },
+      alternatives: {
+        type: 'array',
+        items: {
+          type: 'object',
+          properties: {
+            action: { type: 'string', description: 'Contingency plan action item.' },
+            tradeoff: { type: 'string', description: 'Tradeoff associated with this action.' }
+          },
+          required: ['action', 'tradeoff']
+        }
+      }
+    },
+    required: ['action_plan', 'reasoning', 'risk_level', 'alternatives']
+  };
+
   const model = genAI.getGenerativeModel({
-    model: 'gemini-2.5-flash',
+    model: 'gemini-1.5-flash',
     generationConfig: {
       temperature: 0.3,
       maxOutputTokens: 800,
+      responseMimeType: 'application/json',
+      responseSchema: reasoningOutputSchema as any,
     },
   });
 
@@ -93,13 +127,8 @@ export async function reasonWithGemini(
   const result = await model.generateContent(REASONER_PROMPT_TEMPLATE + simulationSummary);
   const responseText = result.response.text().trim();
 
-  const jsonString = responseText
-    .replace(/^```(?:json)?\s*/i, '')
-    .replace(/\s*```$/i, '')
-    .trim();
-
   try {
-    const parsed = JSON.parse(jsonString);
+    const parsed = JSON.parse(responseText);
     return {
       action_plan: parsed.action_plan ?? [],
       confidence: confidence.composite,

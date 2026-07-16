@@ -91,7 +91,9 @@ export default function AccessibilityCenter({ telemetryState }: AccessibilityCen
           </div>
 
           <form onSubmit={handleBook} className="flex flex-col gap-3">
+            <label htmlFor="passenger-name" className="sr-only">Passenger name</label>
             <input 
+              id="passenger-name"
               type="text" 
               placeholder="Passenger name..." 
               value={userName}
@@ -100,25 +102,33 @@ export default function AccessibilityCenter({ telemetryState }: AccessibilityCen
               required
             />
             <div className="grid grid-cols-2 gap-2">
-              <select 
-                value={assistType} 
-                onChange={(e) => setAssistType(e.target.value)}
-                className="rounded-md border border-zinc-800 bg-zinc-900 px-2 py-1.5 text-[11px] text-zinc-50 outline-none cursor-pointer"
-              >
-                <option value="Wheelchair Escort">Wheelchair Escort</option>
-                <option value="Sensory Pack Pick-up">Sensory Pack Pick-up</option>
-                <option value="Sign Language Interpreter">ASL Interpreter</option>
-                <option value="Golf-Cart Shuttle">Golf-Cart Shuttle</option>
-              </select>
-              <select 
-                value={assistLoc} 
-                onChange={(e) => setAssistLoc(e.target.value)}
-                className="rounded-md border border-zinc-800 bg-zinc-900 px-2 py-1.5 text-[11px] text-zinc-50 outline-none cursor-pointer"
-              >
-                <option value="Gate 2 Entry">Gate 2 Entry</option>
-                <option value="Gate 4 Drop-off">Gate 4 Drop-off</option>
-                <option value="Section 104 Access Hub">Section 104 Access Hub</option>
-              </select>
+              <div>
+                <label htmlFor="assist-type" className="sr-only">Assistance type</label>
+                <select 
+                  id="assist-type"
+                  value={assistType} 
+                  onChange={(e) => setAssistType(e.target.value)}
+                  className="w-full rounded-md border border-zinc-800 bg-zinc-900 px-2 py-1.5 text-[11px] text-zinc-50 outline-none cursor-pointer"
+                >
+                  <option value="Wheelchair Escort">Wheelchair Escort</option>
+                  <option value="Sensory Pack Pick-up">Sensory Pack Pick-up</option>
+                  <option value="Sign Language Interpreter">ASL Interpreter</option>
+                  <option value="Golf-Cart Shuttle">Golf-Cart Shuttle</option>
+                </select>
+              </div>
+              <div>
+                <label htmlFor="assist-loc" className="sr-only">Pickup location</label>
+                <select 
+                  id="assist-loc"
+                  value={assistLoc} 
+                  onChange={(e) => setAssistLoc(e.target.value)}
+                  className="w-full rounded-md border border-zinc-800 bg-zinc-900 px-2 py-1.5 text-[11px] text-zinc-50 outline-none cursor-pointer"
+                >
+                  <option value="Gate 2 Entry">Gate 2 Entry</option>
+                  <option value="Gate 4 Drop-off">Gate 4 Drop-off</option>
+                  <option value="Section 104 Access Hub">Section 104 Access Hub</option>
+                </select>
+              </div>
             </div>
             <button 
               type="submit" 

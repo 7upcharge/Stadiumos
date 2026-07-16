@@ -135,7 +135,9 @@ export default function IncidentCenter({ telemetryState }: IncidentCenterProps) 
           </div>
 
           <form onSubmit={handleReport} className="flex flex-col gap-3">
+            <label htmlFor="report-title" className="sr-only">Incident Title</label>
             <input 
+              id="report-title"
               type="text" 
               placeholder="Incident Title (e.g. Broken gate lock)" 
               value={reportTitle}
@@ -143,34 +145,44 @@ export default function IncidentCenter({ telemetryState }: IncidentCenterProps) 
               className="w-full rounded-md border border-zinc-800 bg-zinc-900 px-3 py-1.5 text-xs text-zinc-50 outline-none focus:border-zinc-600"
               required
             />
+            <label htmlFor="report-desc" className="sr-only">Incident Description</label>
             <textarea 
+              id="report-desc"
               placeholder="Incident description..." 
               value={reportDesc}
               onChange={(e) => setReportDesc(e.target.value)}
               className="w-full rounded-md border border-zinc-800 bg-zinc-900 px-3 py-1.5 text-xs text-zinc-50 outline-none focus:border-zinc-600 min-h-[80px]"
             />
             <div className="grid grid-cols-2 gap-2">
-              <select 
-                value={reportZone} 
-                onChange={(e) => setReportZone(e.target.value)}
-                className="rounded-md border border-zinc-800 bg-zinc-900 px-2 py-1.5 text-xs text-zinc-50 outline-none cursor-pointer"
-              >
-                <option value="Zone A (Main Concourse)">Zone A (North)</option>
-                <option value="Zone B (VIP Suites)">Zone B (West)</option>
-                <option value="Zone C (Gate 4 Entrance)">Zone C (East)</option>
-                <option value="Zone D (South Stands)">Zone D (South)</option>
-                <option value="Zone E (Transit Hub)">Zone E (Transit)</option>
-              </select>
-              <select 
-                value={reportSeverity} 
-                onChange={(e) => setReportSeverity(e.target.value as any)}
-                className="rounded-md border border-zinc-800 bg-zinc-900 px-2 py-1.5 text-xs text-zinc-50 outline-none cursor-pointer"
-              >
-                <option value="LOW">Low</option>
-                <option value="MEDIUM">Medium</option>
-                <option value="HIGH">High</option>
-                <option value="CRITICAL">Critical</option>
-              </select>
+              <div>
+                <label htmlFor="report-zone" className="sr-only">Incident Zone</label>
+                <select 
+                  id="report-zone"
+                  value={reportZone} 
+                  onChange={(e) => setReportZone(e.target.value)}
+                  className="w-full rounded-md border border-zinc-800 bg-zinc-900 px-2 py-1.5 text-xs text-zinc-50 outline-none cursor-pointer"
+                >
+                  <option value="Zone A (Main Concourse)">Zone A (North)</option>
+                  <option value="Zone B (VIP Suites)">Zone B (West)</option>
+                  <option value="Zone C (Gate 4 Entrance)">Zone C (East)</option>
+                  <option value="Zone D (South Stands)">Zone D (South)</option>
+                  <option value="Zone E (Transit Hub)">Zone E (Transit)</option>
+                </select>
+              </div>
+              <div>
+                <label htmlFor="report-severity" className="sr-only">Incident Severity</label>
+                <select 
+                  id="report-severity"
+                  value={reportSeverity} 
+                  onChange={(e) => setReportSeverity(e.target.value as any)}
+                  className="w-full rounded-md border border-zinc-800 bg-zinc-900 px-2 py-1.5 text-xs text-zinc-50 outline-none cursor-pointer"
+                >
+                  <option value="LOW">Low</option>
+                  <option value="MEDIUM">Medium</option>
+                  <option value="HIGH">High</option>
+                  <option value="CRITICAL">Critical</option>
+                </select>
+              </div>
             </div>
             <button 
               type="submit" 

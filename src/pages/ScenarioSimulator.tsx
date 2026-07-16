@@ -168,12 +168,14 @@ export default function ScenarioSimulator({ telemetryState }: ScenarioSimulatorP
           className="flex gap-3"
         >
           <input
+            id="scenario-query-input"
             type="text"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="What happens if Gate 3 closes due to a medical emergency?"
             className="flex-1 px-4 py-3 text-sm rounded-md border border-zinc-800 bg-zinc-900 text-zinc-50 placeholder-zinc-500 outline-none focus:border-zinc-700 transition-colors"
             disabled={isRunning}
+            aria-label="What-if operations scenario question"
           />
           <button
             type="submit"
@@ -311,12 +313,23 @@ export default function ScenarioSimulator({ telemetryState }: ScenarioSimulatorP
               {history.map((record) => (
                 <div
                   key={record.id}
-                  className="flex items-start gap-3 border border-zinc-800/50 rounded-lg p-3 hover:border-zinc-700 transition-colors cursor-pointer"
+                  className="flex items-start gap-3 border border-zinc-800/50 rounded-lg p-3 hover:border-zinc-700 hover:bg-zinc-900/10 focus:outline-none focus:ring-1 focus:ring-cyan-500 transition-colors cursor-pointer"
+                  role="button"
+                  tabIndex={0}
                   onClick={() => {
                     setQuery(record.query);
                     setResult(record.result);
                     setStage('complete');
                   }}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
+                      setQuery(record.query);
+                      setResult(record.result);
+                      setStage('complete');
+                    }
+                  }}
+                  aria-label={`Load simulation for query: ${record.query}`}
                 >
                   <Clock size={12} className="text-zinc-600 mt-0.5 flex-shrink-0" />
                   <div className="min-w-0 flex-1">

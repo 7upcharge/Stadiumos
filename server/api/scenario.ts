@@ -7,6 +7,7 @@
  */
 
 import { Router, type Request, type Response } from 'express';
+import { z } from 'zod';
 import { parseQuery } from '../parser/queryParser.js';
 import { runSimulation } from '../simulator/simulationCore.js';
 import { generateReasoning } from '../reasoner/reasoningLayer.js';
@@ -15,39 +16,55 @@ import { db } from '../config/firebase.js';
 
 export const scenarioRouter = Router();
 
-function validateInput(body: Record<string, unknown>): string | null {
-  if (!body || typeof body.query !== 'string') {
-    return 'Request body must include a "query" field of type string.';
-  }
+// Zod schema definitions for input validation
+const positionSchema = z.object({
+  x: z.number(),
+  y: z.number(),
+});
 
-  const query = body.query.trim();
+const gateStateSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  capacity: z.number(),
+  currentLoad: z.number(),
+  baseWaitMinutes: z.number(),
+  position: positionSchema,
+  adjacentGateIds: z.array(z.string()),
+  isOpen: z.boolean(),
+});
 
-  if (query.length === 0) {
-    return 'Query cannot be empty.';
-  }
+const stadiumStateSchema = z.object({
+  gates: z.array(gateStateSchema),
+  totalCapacity: z.number(),
+  currentAttendance: z.number(),
+  maxAttendance: z.number(),
+  volunteers: z.number(),
+  shuttles: z.number(),
+  parkingUtilization: z.number(),
+});
 
-  if (query.length > 500) {
-    return 'Query exceeds maximum length of 500 characters.';
-  }
-
-  return null;
-}
+const scenarioSimulateSchema = z.object({
+  query: z.string()
+    .min(1, 'Query cannot be empty.')
+    .max(500, 'Query exceeds maximum length of 500 characters.'),
+  beforeState: stadiumStateSchema.optional(),
+});
 
 scenarioRouter.post('/scenario-simulate', async (req: Request, res: Response): Promise<void> => {
   const apiKey = process.env.GEMINI_API_KEY;
   const demoMode = !apiKey;
 
-  const validationError = validateInput(req.body);
-  if (validationError) {
+  const parseResult = scenarioSimulateSchema.safeParse(req.body);
+  if (!parseResult.success) {
     const errorResponse: ApiError = {
-      error: validationError,
+      error: parseResult.error.issues[0]?.message || 'Invalid simulation request body.',
       stage: 'parsing',
     };
     res.status(400).json(errorResponse);
     return;
   }
 
-  const query = (req.body.query as string).trim();
+  const query = parseResult.data.query.trim();
   console.log(`\n${'═'.repeat(60)}`);
   console.log(`🎯 Scenario Simulation Request${demoMode ? ' [DEMO MODE]' : ''}`);
   console.log(`   Query: "${query}"`);
@@ -62,7 +79,7 @@ scenarioRouter.post('/scenario-simulate', async (req: Request, res: Response): P
 
     const simStart = performance.now();
     console.log('🔬 Step 2: Running simulation...');
-    const simulation = runSimulation(parsed, req.body.beforeState as any);
+    const simulation = runSimulation(parsed, parseResult.data.beforeState);
     const simulateMs = performance.now() - simStart;
     console.log(`   ✓ Simulated in ${simulateMs.toFixed(0)}ms`);
     console.log(`   Affected: ${simulation.affectedGateName}`);
@@ -109,6 +126,9 @@ scenarioRouter.post('/scenario-simulate', async (req: Request, res: Response): P
   }
 });
 
+// In-memory simulations fallback store
+const inMemorySimulations: any[] = [];
+
 // ── GET /api/simulations ──
 scenarioRouter.get('/simulations', async (req: Request, res: Response): Promise<void> => {
   try {
@@ -119,8 +139,8 @@ scenarioRouter.get('/simulations', async (req: Request, res: Response): Promise<
     });
     res.json(list);
   } catch (error: any) {
-    console.error('Failed to get simulations:', error.message);
-    res.status(500).json({ error: 'Failed to retrieve simulation history', details: error.message });
+    console.warn('Firestore failed to fetch, returning mock in-memory simulations:', error.message);
+    res.json(inMemorySimulations.slice(0, 20));
   }
 });
 
@@ -139,8 +159,16 @@ scenarioRouter.post('/simulations', async (req: Request, res: Response): Promise
       timestamp: new Date().toISOString(),
       actionPlan: actionPlan ?? [],
     };
-    const docRef = await db.collection('simulations').add(record);
-    res.json({ id: docRef.id, ...record });
+    try {
+      const docRef = await db.collection('simulations').add(record);
+      res.json({ id: docRef.id, ...record });
+    } catch (dbErr: any) {
+      console.warn('Firestore failed to save, saving to in-memory store:', dbErr.message);
+      const mockId = `mock-sim-${Date.now()}`;
+      const savedRecord = { id: mockId, ...record };
+      inMemorySimulations.unshift(savedRecord);
+      res.json(savedRecord);
+    }
   } catch (error: any) {
     console.error('Failed to save simulation:', error.message);
     res.status(500).json({ error: 'Failed to persist simulation run', details: error.message });

@@ -25,7 +25,14 @@ function ConfidenceMeter({ confidence, breakdown }: { confidence: number; breakd
       : '#ef4444';
 
   return (
-    <div className="flex flex-col items-center">
+    <div 
+      className="flex flex-col items-center"
+      role="progressbar"
+      aria-valuenow={Math.round(confidence * 100)}
+      aria-valuemin={0}
+      aria-valuemax={100}
+      aria-label="Simulation confidence level"
+    >
       <div className="relative">
         <svg width="96" height="96" className="sim-confidence-ring">
           <circle cx="48" cy="48" r={radius} className="sim-confidence-ring-bg" strokeWidth="6" />
@@ -43,7 +50,7 @@ function ConfidenceMeter({ confidence, breakdown }: { confidence: number; breakd
           <span className="text-xl font-bold" style={{ color }}>
             {Math.round(confidence * 100)}%
           </span>
-          <span className="text-[8px] text-zinc-500 font-medium font-mono">CONFIDENCE</span>
+          <span className="text-[8px] text-zinc-400 font-semibold font-mono">CONFIDENCE</span>
         </div>
       </div>
 
@@ -166,7 +173,8 @@ export default function SimulatorRecommendationCard({ reasoning, simulation }: P
         <div>
           <button
             onClick={() => setShowAlternatives(!showAlternatives)}
-            className="flex items-center gap-2 text-[10px] font-semibold text-zinc-500 hover:text-cyan-400 transition-colors uppercase tracking-wider font-mono"
+            className="flex items-center gap-2 text-[10px] font-semibold text-zinc-400 hover:text-cyan-400 transition-colors uppercase tracking-wider font-mono"
+            aria-expanded={showAlternatives}
           >
             <svg
               className={`w-3 h-3 transition-transform duration-200 ${showAlternatives ? 'rotate-90' : ''}`}

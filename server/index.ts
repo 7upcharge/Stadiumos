@@ -5,29 +5,12 @@
  * /api requests here, so in development both servers run concurrently.
  */
 
-import express from 'express';
-import cors from 'cors';
+import app from './app.js';
 import dotenv from 'dotenv';
-import { scenarioRouter } from './api/scenario.js';
 
 dotenv.config();
 
-const app = express();
 const PORT = process.env.PORT ?? 3001;
-
-app.use(cors());
-app.use(express.json());
-
-app.use('/api', scenarioRouter);
-
-app.get('/api/health', (_req, res) => {
-  res.json({
-    status: 'ok',
-    service: 'StadiumOS AI Scenario Simulator',
-    demoMode: !process.env.GEMINI_API_KEY,
-    timestamp: new Date().toISOString(),
-  });
-});
 
 app.listen(PORT, () => {
   const demoMode = !process.env.GEMINI_API_KEY;

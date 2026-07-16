@@ -68,8 +68,9 @@ const notifyObservers = () => {
   observers.forEach(callback => callback(state));
 };
 
-// Simulation Loop running every 3 seconds
-setInterval(() => {
+let intervalId: ReturnType<typeof setInterval> | null = null;
+
+const runSimulationTick = () => {
   state.currentTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
   state.totalAttendance += Math.floor(Math.random() * 5) - 2;
 
@@ -101,13 +102,22 @@ setInterval(() => {
   state.sustainability.landfillBinFill = Math.min(100, +(state.sustainability.landfillBinFill + Math.random() * 0.1).toFixed(1));
 
   notifyObservers();
-}, 3000);
+};
 
 export const subscribeToTelemetry = (callback: ObserverCallback) => {
   observers.push(callback);
   callback(state);
+
+  if (!intervalId) {
+    intervalId = setInterval(runSimulationTick, 3000);
+  }
+
   return () => {
     observers = observers.filter(cb => cb !== callback);
+    if (observers.length === 0 && intervalId) {
+      clearInterval(intervalId);
+      intervalId = null;
+    }
   };
 };
 

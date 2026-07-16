@@ -82,6 +82,14 @@ export default function App() {
 
   return (
     <div className="flex min-h-screen bg-zinc-950 text-zinc-50">
+      {/* Skip to Content Link */}
+      <a 
+        href="#main-content" 
+        className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:rounded focus:bg-cyan-600 focus:px-4 focus:py-2 focus:text-sm focus:font-semibold focus:text-white focus:outline-none focus:ring-2 focus:ring-cyan-400"
+      >
+        Skip to content
+      </a>
+
       {/* Sidebar navigation */}
       <Sidebar 
         currentPage={currentPage} 
@@ -99,7 +107,7 @@ export default function App() {
           onOpenCommandPalette={() => setIsCommandPaletteOpen(true)}
         />
 
-        <main className="flex-grow p-6">
+        <main id="main-content" tabIndex={-1} className="flex-grow p-6 outline-none">
           {/* Split grid: Page Content + Contextual AI Sidebar Panel */}
           <div className="flex flex-col lg:flex-row gap-6 items-start">
             <div className="flex-grow w-full min-w-0">
