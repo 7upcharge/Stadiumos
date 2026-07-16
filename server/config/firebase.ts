@@ -12,7 +12,7 @@ let isMock = false;
 // Simple In-Memory Mock Database for Firestore CRUD operations
 class MockDocRef {
   private collectionName: string;
-  private id: string;
+  public readonly id: string;
   private memoryStore: Record<string, Record<string, any>>;
 
   constructor(collectionName: string, id: string, memoryStore: any) {
